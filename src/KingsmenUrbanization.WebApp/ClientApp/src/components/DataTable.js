@@ -15,9 +15,9 @@ const SortOrderEnum = {
     Descending: 'desc',
 }
 
-const Headers = [
+const TableHeaders = [
     {id: 'stateFips', label: 'State Fips'},
-    {id: 'state', label: 'State'},
+    {id: 'stateName', label: 'State'},
     {id: 'gisJoin', label: 'GisJoin'},
     {id: 'latLong', label: 'Lat/Long'},
     {id: 'population', label: 'Population'},
@@ -25,12 +25,11 @@ const Headers = [
 ];
 
 export default function DataTable() {
-    const [sortOrder, setSortOrder] = React.useState(SortOrderEnum.None);
     const [orderBy, setOrderBy] = React.useState();
     const [order, setOrder] = React.useState();
     const [page, setPage] = React.useState(0);
     const [urbanizationData, setUrbanizationData] = React.useState();
-    const [totalCount, setTotalCount] = React.useState();
+    const [totalCount, setTotalCount] = React.useState(0);
     const [rowsPerPage, setRowsPerPage] = React.useState(10);
 
     React.useEffect(() => {
@@ -44,20 +43,26 @@ export default function DataTable() {
 
     React.useEffect(() => {
         setUrbanizationData(undefined);
+        
+        const createQueryString = () => {
+            const data = {'page': page, 'rowsPerPage': rowsPerPage,
+             'orderBy': orderBy ?? "", 'order': order ?? ""
+            };
+            return encodeData(data);
+        }
+
         const getUrbanizationByState = async () => {
-            const response = await fetch('urbanization?' + createQueryString());
+            // fetch('urbanization?' + createQueryString()).then((resp) => resp.json()).then((data) => setUrbanizationData(data));
+            const myHeaders = new Headers();
+            myHeaders.append('Content-Type', 'application/json');
+            const response = await fetch('urbanization?' + createQueryString(), { 
+                headers: {'Content-Type': 'application/json'}});
             const data = await response.json();
             setUrbanizationData(data);
         }
         getUrbanizationByState();
-    }, [page, rowsPerPage, sortOrder]);
+    }, [page, rowsPerPage, orderBy, order]);
 
-    const createQueryString = () => {
-        const data = {'page': page, 'rowsPerPage': rowsPerPage,
-        //  'orderBy': orderBy, 'order': order
-        };
-        return encodeData(data);
-    }
 
     const encodeData = (data) => {
         const ret = [];
@@ -68,7 +73,7 @@ export default function DataTable() {
 
     const onHeaderClick = (event, headerId) => {
         if (headerId === orderBy)
-            setOrder(SortOrderEnum.Descending);
+            setOrder(order === SortOrderEnum.Ascending ? SortOrderEnum.Descending : SortOrderEnum.Ascending);
         else {
             setOrderBy(headerId);
             setOrder(SortOrderEnum.Ascending);
@@ -82,7 +87,7 @@ export default function DataTable() {
                     <Table>
                         <TableHead>
                             <TableRow>
-                                {Headers.map((header) => {
+                                {TableHeaders.map((header) => {
                                     return (<TableCell key={header.id} sortDirection={orderBy === header.id ? order : false}>
                                         <TableSortLabel active={header.id === orderBy} direction={orderBy === header.id ? order : 'asc'} onClick={(event) => onHeaderClick(event, header.id)}>{header.label}</TableSortLabel>
                                     </TableCell>)
@@ -115,7 +120,7 @@ export default function DataTable() {
         )
     }
     
-    const handleChangeRowsPerPage = (event, newPage) => {
+    const handleChangeRowsPerPage = (event) => {
         setRowsPerPage(parseInt(event.target.value, 10));
         setPage(0);
     }

@@ -21,8 +21,13 @@ namespace Urbanization.Data.Stores
 
         public IEnumerable<UrbanizationByState> GetUrbanizationByStates()
         {
-            var test = _DbContext as DbContext;
             return _DbContext.UrbanizationByState;
         }
+
+
+        //public Task<IEnumerable<UrbanizationByState>> GetUrbanizationByStates()
+        //{
+        //    return Task.FromResult(_DbContext.UrbanizationByState as IEnumerable<UrbanizationByState>);
+        //}
     }
 }
