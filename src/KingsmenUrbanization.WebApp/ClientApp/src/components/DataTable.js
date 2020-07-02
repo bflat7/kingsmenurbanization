@@ -31,6 +31,8 @@ export default function DataTable() {
     const [urbanizationData, setUrbanizationData] = React.useState();
     const [totalCount, setTotalCount] = React.useState(0);
     const [rowsPerPage, setRowsPerPage] = React.useState(10);
+    const [errorMessage, setError] = React.useState();
+    const [loading, setLoading] = React.useState(true);
 
     React.useEffect(() => {
         const getTotalUrbanizationByState = async () => {
@@ -42,7 +44,7 @@ export default function DataTable() {
     }, []);
 
     React.useEffect(() => {
-        setUrbanizationData(undefined);
+        setLoading(true);
         
         const createQueryString = () => {
             const data = {'page': page, 'rowsPerPage': rowsPerPage,
@@ -57,8 +59,15 @@ export default function DataTable() {
             myHeaders.append('Content-Type', 'application/json');
             const response = await fetch('urbanization?' + createQueryString(), { 
                 headers: {'Content-Type': 'application/json'}});
-            const data = await response.json();
-            setUrbanizationData(data);
+            if (response.status == 200) {
+                const data = await response.json();
+                setUrbanizationData(data);
+            } else {
+                const errorMessage = await response.json();
+                setUrbanizationData([]);
+                setError(errorMessage);
+            }
+            setLoading(false);
         }
         getUrbanizationByState();
     }, [page, rowsPerPage, orderBy, order]);
@@ -81,8 +90,10 @@ export default function DataTable() {
     }
 
     const getMuiDataTable = (dataSet) => {
+        console.log(loading);
         return (
             <div>
+                {errorMessage && <><p>{errorMessage}</p><br/></>}
                 <TableContainer component={Paper}>
                     <Table>
                         <TableHead>
@@ -95,7 +106,7 @@ export default function DataTable() {
                             </TableRow>
                         </TableHead>
                         <TableBody>
-                            {dataSet.map((data) => (
+                            {dataSet && dataSet.map((data) => (
                                 <TableRow key={data.id}>
                                     <TableCell >{data.stateName}</TableCell >
                                     <TableCell >{data.stateFips}</TableCell >
@@ -130,7 +141,7 @@ export default function DataTable() {
 
     return (
         <div>
-            {urbanizationData ? 
+            {!loading ? 
                 getMuiDataTable(urbanizationData) :
                 <p><em>Loading...</em></p>
             }

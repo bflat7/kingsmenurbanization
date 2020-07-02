@@ -17,41 +17,42 @@ namespace Urbanization.WebApp.Services
             _UrbanizationByStateStore = urbanizationByStateStore;
         }
 
-        public IEnumerable<UrbanizationByStateModel> GetStateUrbanization()
+        public async Task<int> GetCountyUrbanizationCount()
         {
-            return _UrbanizationByStateStore.GetUrbanizationByStates().Select(u => new UrbanizationByStateModel
-            {   
-                Id = u.Id,
-                StateName = u.StateName,
-                StateFips = u.StateFips,
-                LatLong = $"({u.Latitude}, {u.Longditude})",
-                GisJoin = u.GISJoin,
-                Population = u.Population,
-                UrbanIndex = u.UrbanIndex,
-            });
+            return (await _UrbanizationByStateStore.GetUrbanizationByStates()).Count();
         }
 
-        public IEnumerable<UrbanizationByStateModel> GetStateUrbanizationSortedPaged(int page, int rowsPerPage, string orderBy, string order)
+        public async Task<IEnumerable<UrbanizationByStateModel>> GetStateUrbanizationSortedPaged(int page, int rowsPerPage, string orderBy, string order)
         {
+            if (!string.IsNullOrEmpty(order) && order.ToLowerInvariant() != "desc" && order.ToLowerInvariant() != "asc")
+                throw new ArgumentException();
+
             IEnumerable<UrbanizationByStateModel> data;
-            if (!string.IsNullOrEmpty(orderBy) && !string.IsNullOrEmpty(order))
+            if (!string.IsNullOrEmpty(orderBy))
             {
-                string formatedOrderBy = char.ToUpper(orderBy[0]) + orderBy.Substring(1);
-                data = _UrbanizationByStateStore.GetUrbanizationByStates().Select(u => new UrbanizationByStateModel
+                try
                 {
-                    Id = u.Id,
-                    StateName = u.StateName,
-                    StateFips = u.StateFips,
-                    LatLong = $"({u.Latitude}, {u.Longditude})",
-                    GisJoin = u.GISJoin,
-                    Population = u.Population,
-                    UrbanIndex = u.UrbanIndex,
-                }).AsQueryable().Sort($"{formatedOrderBy} {order}").Skip(page * rowsPerPage).Take(rowsPerPage);
-                var test = data.AsQueryable().Expression;
+                    string formatedOrderBy = char.ToUpper(orderBy[0]) + orderBy.Substring(1);
+                    data = (await _UrbanizationByStateStore.GetUrbanizationByStates()).Select(u => new UrbanizationByStateModel
+                    {
+                        Id = u.Id,
+                        StateName = u.StateName,
+                        StateFips = u.StateFips,
+                        LatLong = $"({u.Latitude}, {u.Longditude})",
+                        GisJoin = u.GISJoin,
+                        Population = u.Population,
+                        UrbanIndex = u.UrbanIndex,
+                    }).AsQueryable().Sort($"{formatedOrderBy} {order}").Skip(page * rowsPerPage).Take(rowsPerPage);
+                } catch(System.Linq.Dynamic.Core.Exceptions.ParseException ex)
+                {
+                    if (ex.Message.ToLowerInvariant().Contains("no property or field"))
+                        throw new ArgumentException(ex.Message);
+                    throw ex;
+                }
             }
             else
             {
-                data = _UrbanizationByStateStore.GetUrbanizationByStates().Skip(page * rowsPerPage).Take(rowsPerPage).Select(u => new UrbanizationByStateModel
+                data = (await _UrbanizationByStateStore.GetUrbanizationByStates()).Select(u => new UrbanizationByStateModel
                 {
                     Id = u.Id,
                     StateName = u.StateName,
@@ -60,44 +61,9 @@ namespace Urbanization.WebApp.Services
                     GisJoin = u.GISJoin,
                     Population = u.Population,
                     UrbanIndex = u.UrbanIndex,
-                });
+                }).Skip(page * rowsPerPage).Take(rowsPerPage).ToList();
             }
             return data;
         }
-
-
-        //public async Task<int> GetCountyUrbanizationCount()
-        //{
-        //    return (await _UrbanizationByStateStore.GetUrbanizationByStates()).Count();
-        //}
-
-        //public async Task<IEnumerable<UrbanizationByStateModel>> GetStateUrbanization()
-        //{
-        //    return (await _UrbanizationByStateStore.GetUrbanizationByStates()).Select(u => new UrbanizationByStateModel
-        //    {
-        //        Id = u.Id,
-        //        StateName = u.StateName,
-        //        StateFips = u.StateFips,
-        //        LatLong = $"({u.Latitude}, {u.Longditude})",
-        //        GISJoin = u.GISJoin,
-        //        Population = u.Population,
-        //        UrbanIndex = u.UrbanIndex,
-        //    });
-        //}
-
-        //public async Task<IEnumerable<UrbanizationByStateModel>> GetStateUrbanizationSortedPaged(int page, int rowsPerPage, string orderBy, string order)
-        //{
-        //    var data = (await _UrbanizationByStateStore.GetUrbanizationByStates()).AsQueryable().Sort($"{orderBy} {order}").Skip(page * rowsPerPage).Take(rowsPerPage).Select(u => new UrbanizationByStateModel
-        //    {
-        //        Id = u.Id,
-        //        StateName = u.StateName,
-        //        StateFips = u.StateFips,
-        //        LatLong = $"({u.Latitude}, {u.Longditude})",
-        //        GISJoin = u.GISJoin,
-        //        Population = u.Population,
-        //        UrbanIndex = u.UrbanIndex,
-        //    });
-        //    return data;
-        //}
     }
 }

@@ -3,9 +3,15 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30114.105
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KingsmenUrbanization.WebApp", "src\KingsmenUrbanization.WebApp\KingsmenUrbanization.WebApp.csproj", "{177112DE-9F03-48F2-B9FB-CA0F9F63B960}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "KingsmenUrbanization.WebApp", "src\KingsmenUrbanization.WebApp\KingsmenUrbanization.WebApp.csproj", "{177112DE-9F03-48F2-B9FB-CA0F9F63B960}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KingsmenUrbanization.Data", "src\KingsmenUrbanization.Data\KingsmenUrbanization.Data.csproj", "{0B3153F7-48C3-4FAE-9D36-6C64A3684CAD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "KingsmenUrbanization.Data", "src\KingsmenUrbanization.Data\KingsmenUrbanization.Data.csproj", "{0B3153F7-48C3-4FAE-9D36-6C64A3684CAD}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "UnitTests", "UnitTests", "{05E72F7A-C51B-41A5-9DF5-CB6465E01ECE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KingsmenUrbanization.Data.UnitTests", "KingsmenUrbanization.Data.UnitTests\KingsmenUrbanization.Data.UnitTests.csproj", "{13F42576-2D15-47CB-BE46-EA85DAF34F19}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KingsmenUrbanization.WebApp.UnitTests", "KingsmenUrbanization.WebApp.UnitTests\KingsmenUrbanization.WebApp.UnitTests.csproj", "{91776E3A-FC2B-4D3D-A68C-C7732488B22B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,9 +27,21 @@ Global
 		{0B3153F7-48C3-4FAE-9D36-6C64A3684CAD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0B3153F7-48C3-4FAE-9D36-6C64A3684CAD}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0B3153F7-48C3-4FAE-9D36-6C64A3684CAD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{13F42576-2D15-47CB-BE46-EA85DAF34F19}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{13F42576-2D15-47CB-BE46-EA85DAF34F19}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{13F42576-2D15-47CB-BE46-EA85DAF34F19}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{13F42576-2D15-47CB-BE46-EA85DAF34F19}.Release|Any CPU.Build.0 = Release|Any CPU
+		{91776E3A-FC2B-4D3D-A68C-C7732488B22B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{91776E3A-FC2B-4D3D-A68C-C7732488B22B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{91776E3A-FC2B-4D3D-A68C-C7732488B22B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{91776E3A-FC2B-4D3D-A68C-C7732488B22B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{13F42576-2D15-47CB-BE46-EA85DAF34F19} = {05E72F7A-C51B-41A5-9DF5-CB6465E01ECE}
+		{91776E3A-FC2B-4D3D-A68C-C7732488B22B} = {05E72F7A-C51B-41A5-9DF5-CB6465E01ECE}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {B80212DB-B274-423B-A655-D9CF51BB4769}
