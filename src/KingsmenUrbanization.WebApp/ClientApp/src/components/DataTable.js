@@ -8,14 +8,16 @@ import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
 import TablePagination from '@material-ui/core/TablePagination';
 import { TableSortLabel } from "@material-ui/core";
+import Button from "@material-ui/core/Button";
+import UrbanizationService from "../api/UrbanizationService";
 
-const SortOrderEnum = {
+export const SortOrderEnum = {
     None: 'none',
     Ascending: 'asc',
     Descending: 'desc',
 }
 
-const TableHeaders = [
+export const TableHeaders = [
     {id: 'stateFips', label: 'State Fips'},
     {id: 'stateName', label: 'State'},
     {id: 'gisJoin', label: 'GisJoin'},
@@ -33,52 +35,106 @@ export default function DataTable() {
     const [rowsPerPage, setRowsPerPage] = React.useState(10);
     const [errorMessage, setError] = React.useState();
     const [loading, setLoading] = React.useState(true);
+    const urbService = new UrbanizationService();
+
+    // React.useEffect(async () => {
+    //     try {
+    //         const result = await urbService.getTotalUrbanzationByStateDataCount();
+    //         setTotalCount(result);
+    //     } catch (e) {
+    //         setError(e.message);
+    //     }
+    // }, []);
 
     React.useEffect(() => {
-        const getTotalUrbanizationByState = async () => {
-            const response = await fetch('urbanization/count');
-            const data = await response.json();
-            setTotalCount(data);
+        const getCount = async () => {
+            try {
+                const result = await urbService.getTotalUrbanzationByStateDataCount();
+                setTotalCount(result);
+            } catch (e) {
+                setError(e.message);
+            }
         }
-        getTotalUrbanizationByState();
+        getCount();
     }, []);
 
-    React.useEffect(() => {
-        setLoading(true);
+    // React.useEffect(async () => {
+    //     setLoading(true);
+    //     try {
+    //         const result = await urbService.getUrbanizationByStateData(page, rowsPerPage, orderBy, order);
+    //         setError(null);
+    //         setUrbanizationData(result);
+    //     } catch (e) {
+    //         setError(e.message);
+    //         setUrbanizationData([]);
+    //     }
         
-        const createQueryString = () => {
-            const data = {'page': page, 'rowsPerPage': rowsPerPage,
-             'orderBy': orderBy ?? "", 'order': order ?? ""
-            };
-            return encodeData(data);
+    //     setLoading(false);
+    // }, [page, rowsPerPage, orderBy, order]);
+
+    React.useEffect(() => {
+        async function getData() {
+            try {
+                const result = await urbService.getUrbanizationByStateData(page, rowsPerPage, orderBy, order);
+                setError(null);
+                setUrbanizationData(result);
+            } catch (e) {
+                setError(e.message);
+                setUrbanizationData([]);
+            }
         }
 
-        const getUrbanizationByState = async () => {
-            // fetch('urbanization?' + createQueryString()).then((resp) => resp.json()).then((data) => setUrbanizationData(data));
-            const myHeaders = new Headers();
-            myHeaders.append('Content-Type', 'application/json');
-            const response = await fetch('urbanization?' + createQueryString(), { 
-                headers: {'Content-Type': 'application/json'}});
-            if (response.status == 200) {
-                const data = await response.json();
-                setUrbanizationData(data);
-            } else {
-                const errorMessage = await response.json();
-                setUrbanizationData([]);
-                setError(errorMessage);
-            }
-            setLoading(false);
-        }
-        getUrbanizationByState();
+        setLoading(true);
+        getData();
+        setLoading(false);
     }, [page, rowsPerPage, orderBy, order]);
 
+    // React.useEffect(() => {
+    //     const getTotalUrbanizationByState = async () => {
+    //         const response = await fetch('urbanization/count');
+    //         const data = await response.json();
+    //         setTotalCount(data);
+    //     }
+    //     getTotalUrbanizationByState();
+    // }, []);
 
-    const encodeData = (data) => {
-        const ret = [];
-        for (let d in data)
-          ret.push(encodeURIComponent(d) + '=' + encodeURIComponent(data[d]));
-        return ret.join('&');
-    }
+    // React.useEffect(() => {
+    //     setLoading(true);
+        
+    //     const createQueryString = () => {
+    //         const data = {'page': page, 'rowsPerPage': rowsPerPage,
+    //          'orderBy': orderBy ?? "", 'order': order ?? ""
+    //         };
+    //         return encodeData(data);
+    //     }
+
+    //     const getUrbanizationByState = async () => {
+    //         // fetch('urbanization?' + createQueryString()).then((resp) => resp.json()).then((data) => setUrbanizationData(data));
+    //         const myHeaders = new Headers();
+    //         myHeaders.append('Content-Type', 'application/json');
+    //         const response = await fetch('urbanization?' + createQueryString(), { 
+    //             headers: {'Content-Type': 'application/json'}});
+    //         if (response.status === 200) {
+    //             const data = await response.json();
+    //             setUrbanizationData(data);
+    //             setError(null);
+    //         } else {
+    //             const errorMessage = await response.json();
+    //             setUrbanizationData([]);
+    //             setError(errorMessage);
+    //         }
+    //         setLoading(false);
+    //     }
+    //     getUrbanizationByState();
+    // }, [page, rowsPerPage, orderBy, order]);
+
+
+    // const encodeData = (data) => {
+    //     const ret = [];
+    //     for (let d in data)
+    //       ret.push(encodeURIComponent(d) + '=' + encodeURIComponent(data[d]));
+    //     return ret.join('&');
+    // }
 
     const onHeaderClick = (event, headerId) => {
         if (headerId === orderBy)
@@ -145,6 +201,7 @@ export default function DataTable() {
                 getMuiDataTable(urbanizationData) :
                 <p><em>Loading...</em></p>
             }
+            <Button variant="contained" onClick={(event) => {errorMessage ? setError(null) : setError("show error")}}>Show Error</Button>
         </div>
     )
 }

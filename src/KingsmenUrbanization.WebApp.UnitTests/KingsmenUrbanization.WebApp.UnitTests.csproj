@@ -17,8 +17,8 @@
 
   <ItemGroup>
     <ProjectReference Include="..\KingsmenUrbanization.Data.UnitTests\KingsmenUrbanization.Data.UnitTests.csproj" />
-    <ProjectReference Include="..\src\KingsmenUrbanization.Data\KingsmenUrbanization.Data.csproj" />
-    <ProjectReference Include="..\src\KingsmenUrbanization.WebApp\KingsmenUrbanization.WebApp.csproj" />
+    <ProjectReference Include="..\KingsmenUrbanization.Data\KingsmenUrbanization.Data.csproj" />
+    <ProjectReference Include="..\KingsmenUrbanization.WebApp\KingsmenUrbanization.WebApp.csproj" />
   </ItemGroup>
 
 </Project>

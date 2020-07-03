@@ -9,9 +9,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "KingsmenUrbanization.Data",
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "UnitTests", "UnitTests", "{05E72F7A-C51B-41A5-9DF5-CB6465E01ECE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KingsmenUrbanization.Data.UnitTests", "KingsmenUrbanization.Data.UnitTests\KingsmenUrbanization.Data.UnitTests.csproj", "{13F42576-2D15-47CB-BE46-EA85DAF34F19}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KingsmenUrbanization.Data.UnitTests", "src\KingsmenUrbanization.Data.UnitTests\KingsmenUrbanization.Data.UnitTests.csproj", "{13F42576-2D15-47CB-BE46-EA85DAF34F19}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KingsmenUrbanization.WebApp.UnitTests", "KingsmenUrbanization.WebApp.UnitTests\KingsmenUrbanization.WebApp.UnitTests.csproj", "{91776E3A-FC2B-4D3D-A68C-C7732488B22B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KingsmenUrbanization.WebApp.UnitTests", "src\KingsmenUrbanization.WebApp.UnitTests\KingsmenUrbanization.WebApp.UnitTests.csproj", "{91776E3A-FC2B-4D3D-A68C-C7732488B22B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
