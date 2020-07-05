@@ -65,5 +65,10 @@ namespace Urbanization.WebApp.Services
             }
             return data;
         }
+
+        private IQueryable<UrbanizationByState> AddFilters(string filters)
+        {
+            return null;
+        }
     }
 }

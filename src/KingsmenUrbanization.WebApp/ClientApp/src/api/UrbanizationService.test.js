@@ -11,7 +11,7 @@ describe("UrbanizationService test", () => {
 
     describe("getTotalUrbanizationByStateDataCount tests", () => {
         const countEndpoint = "urbanization/count";
-        
+
         it("throws error when not success code", () => {
             fetchMock.mock(countEndpoint, 500);
             const promise = urbService.getTotalUrbanzationByStateDataCount(); 
