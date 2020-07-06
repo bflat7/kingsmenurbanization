@@ -165,7 +165,7 @@ export default function DataTable() {
                 getMuiDataTable(urbanizationData) :
                 <p><em>Loading...</em></p>
             }
-            <Button variant="contained" color="primary" onClick={(event) => { 
+            <Button disabled={!loading} variant="contained" color="primary" onClick={(event) => { 
                 controllerRef.current.abort();
                 controllerRef.current = new AbortController();
                 setUrbanizationData([]);
