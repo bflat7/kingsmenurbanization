@@ -11,14 +11,22 @@ import { TableSortLabel } from "@material-ui/core";
 import Button from "@material-ui/core/Button";
 import UrbanizationService from "../api/UrbanizationService";
 import { makeStyles } from "@material-ui/core/styles";
-import Backdrop from "@material-ui/core/Backdrop";
-import CircularProgress from "@material-ui/core/CircularProgress";
+import LinearProgress from "@material-ui/core/LinearProgress";
 
 const useStyles = makeStyles((theme) => ({
     backdrop: {
       zIndex: theme.zIndex.drawer + 1,
       color: "#fff",
     },
+    tblContainer: {
+      height: 440,
+    },
+    container: {
+        marginTop: "3rem",
+    },
+    progress: {
+        top: "50%",
+    }
   }));
 
 export const SortOrderEnum = {
@@ -43,10 +51,12 @@ export default function DataTable() {
     const [urbanizationData, setUrbanizationData] = React.useState();
     const [totalCount, setTotalCount] = React.useState(0);
     const [rowsPerPage, setRowsPerPage] = React.useState(10);
-    const [errorMessage, setError] = React.useState();
-    const [loading, setLoading] = React.useState(true);
+    const [errorMessage, setErrorMessage] = React.useState();
+    const [loading, setLoading] = React.useState(false);
     const urbService = new UrbanizationService();
     const classes = useStyles();
+    
+    let controllerRef = React.useRef(new AbortController());
 
     React.useEffect(() => {
         const getCount = async () => {
@@ -55,31 +65,35 @@ export default function DataTable() {
                 setTotalCount(result);
             } catch (e) {
                 Boolean(errorMessage) ? 
-                    setError((prevError) => {prevError.concat("\n", e.message)}) :
-                    setError(e.message);
-            }
+                    setErrorMessage((prevError) => {prevError.concat("\n", e.message)}) :
+                    setErrorMessage(e.message);
+            }   
         }
         getCount();
     }, []);
 
     React.useEffect(() => {
-        async function getData() {
-            try {
-                const result = await urbService.getUrbanizationByStateData(page, rowsPerPage, orderBy, order);
-                setError(null);
-                setUrbanizationData(result);
-                setLoading(false);
-            } catch (e) {
+        if (loading) {
+            controllerRef.current.abort();
+            controllerRef.current = new AbortController();
+        }
+        setLoading(true);
+        
+        urbService.getUrbanizationByStateData(page, rowsPerPage, orderBy, order, controllerRef.current.signal).then((data) => {
+            setErrorMessage(null);
+            setUrbanizationData(data);
+            setLoading(false);
+        }).catch((err) => {
+            if (err.Name = "AbortError") {
+                setErrorMessage(err.message);
+            } else {
                 Boolean(errorMessage) ? 
-                    setError((prevError) => {prevError.concat("\n", e.message)}) :
-                    setError(e.message);
+                    setErrorMessage((prevError) => {prevError.concat("\n", err.message)}) :
+                    setErrorMessage(err.message);
                 setUrbanizationData([]);
                 setLoading(false);
             }
-        }
-
-        setLoading(true);
-        getData();
+        });
     }, [page, rowsPerPage, orderBy, order]);
 
     const onHeaderClick = (event, headerId) => {
@@ -88,19 +102,22 @@ export default function DataTable() {
         else {
             setOrderBy(headerId);
             setOrder(SortOrderEnum.Ascending);
-        } 
+        }
+        setUrbanizationData([]);
+        setLoading(true);
     }
 
     const getMuiDataTable = (dataSet) => {
         return (
-            <div>
+            <div className={classes.container}>
                 {errorMessage && <><p aria-label={"Error Message"}>{errorMessage}</p><br/></>}
-                <TableContainer component={Paper}>
+                <TableContainer component={Paper} className={classes.tblContainer}>
+                    {loading ? <LinearProgress className={classes.progress} color="primary"/> :
                     <Table>
                         <TableHead>
                             <TableRow>
                                 {TableHeaders.map((header) => {
-                                    return (<TableCell key={header.id} aria-label={header.id} title={header.title} sortDirection={orderBy === header.id ? order : false}>
+                                    return (<TableCell key={header.id} align="center" aria-label={header.id} title={header.title} sortDirection={orderBy === header.id ? order : false}>
                                         <TableSortLabel active={header.id === orderBy} aria-label={"Sort Order"} direction={orderBy === header.id ? order : "asc"} onClick={(event) => onHeaderClick(event, header.id)}>{header.label}</TableSortLabel>
                                     </TableCell>)
                                 })}
@@ -109,19 +126,19 @@ export default function DataTable() {
                         <TableBody>
                             {dataSet && dataSet.map((data) => (
                                 <TableRow key={data.id}>
-                                    <TableCell >{data.stateFips}</TableCell >
-                                    <TableCell >{data.stateName}</TableCell >
-                                    <TableCell >{data.gisJoin}</TableCell >
-                                    <TableCell >{data.latLong}</TableCell >
-                                    <TableCell >{data.population}</TableCell >
-                                    <TableCell >{data.urbanIndex}</TableCell >
+                                    <TableCell align="center">{data.stateFips}</TableCell >
+                                    <TableCell align="center">{data.stateName}</TableCell >
+                                    <TableCell align="center">{data.gisJoin}</TableCell >
+                                    <TableCell align="center">{data.latLong}</TableCell >
+                                    <TableCell align="center">{data.population}</TableCell >
+                                    <TableCell align="center">{data.urbanIndex}</TableCell >
                                 </TableRow>
                             ))}
                         </TableBody>
-                    </Table>
+                    </Table>}
                 </TableContainer>
                 <TablePagination
-                    rowsPerPageOptions={[10, 20, 50, 10000]}
+                    rowsPerPageOptions={[10, 20, 50, 100, 10000]}
                     component="div"
                     count={totalCount}
                     rowsPerPage={rowsPerPage}
@@ -131,16 +148,15 @@ export default function DataTable() {
             </div>
         )
     }
-    const handleClose = () => {
-        setLoading(false);
-    };
     
     const handleChangeRowsPerPage = (event) => {
         setRowsPerPage(parseInt(event.target.value, 10));
         setPage(0);
+        setUrbanizationData([]);
     }
     const handlePageChange = (event, newPage) => {
         setPage(newPage);
+        setUrbanizationData([]);
     }
 
     return (
@@ -149,10 +165,11 @@ export default function DataTable() {
                 getMuiDataTable(urbanizationData) :
                 <p><em>Loading...</em></p>
             }
-            <Button variant="contained" onClick={(event) => {errorMessage ? setError(null) : setError("show error")}}>Show Error</Button>
-                <Backdrop className={classes.backdrop} open={loading}>
-                    <CircularProgress color="inherit" />
-                </Backdrop>
+            <Button variant="contained" color="primary" onClick={(event) => { 
+                controllerRef.current.abort();
+                controllerRef.current = new AbortController();
+                setUrbanizationData([]);
+                setLoading(false);}}> Abort Call </Button>
         </div>
     )
 }

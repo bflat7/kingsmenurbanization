@@ -13,18 +13,11 @@ namespace Urbanization.Data.Stores
     public class UrbanizationByStateStore : IUrbanizationByStateStore
     {
         private IUrbanizationDbContext _DbContext;
-        //public UrbanizationByStateStore
 
         public UrbanizationByStateStore(IUrbanizationDbContext dbContext)
         {
             _DbContext = dbContext;
         }
-
-        //public IEnumerable<UrbanizationByState> GetUrbanizationByStates()
-        //{
-        //    return _DbContext.UrbanizationByState;
-        //}
-
 
         public Task<IEnumerable<UrbanizationByState>> GetUrbanizationByStates()
         {

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using System.Net;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
@@ -24,42 +25,6 @@ namespace KingsmenUrbanization.WebApp.Controllers
             _logger = logger;
         }
 
-        //[HttpGet]
-        //public IEnumerable<UrbanizationByStateModel> Get()
-        //{
-        //    return _UrbanizationByStateService.GetStateUrbanization();
-        //}
-
-        //[HttpGet]
-        //public ActionResult<IEnumerable<UrbanizationByStateModel>> GetWithPagination(int page, int rowsPerPage, string orderBy, string order)
-        //{
-        //    try
-        //    {
-        //        //var data = _UrbanizationByStateService.GetStateUrbanization().Skip(rowsPerPage * page).Take(rowsPerPage);
-        //        var data = _UrbanizationByStateService.GetStateUrbanizationSortedPaged(page, rowsPerPage, orderBy, order);
-        //        return new JsonResult(data);
-        //    } catch(Exception ex)
-        //    {
-        //        _logger.LogInformation(ex.Message);
-        //        return new JsonResult(ex.Message);
-        //    }
-        //}
-
-        //[HttpGet("Count")]
-        //public ActionResult<int> GetTotalRows()
-        //{
-        //    try
-        //    {
-        //        var count = _UrbanizationByStateService.GetStateUrbanization().Count();
-        //        return new JsonResult(count);
-        //    } catch (Exception ex)
-        //    {
-        //        _logger.LogInformation(ex.Message);
-        //        return new JsonResult(ex.Message);
-        //    }
-        //}
-
-
         [HttpGet]
         public async Task<ActionResult<IEnumerable<UrbanizationByStateModel>>> GetWithPagination(int page, int rowsPerPage, string orderBy, string order)
         {
@@ -68,10 +33,14 @@ namespace KingsmenUrbanization.WebApp.Controllers
                 var data = (await _UrbanizationByStateService.GetStateUrbanizationSortedPaged(page, rowsPerPage, orderBy, order));
                 return Ok(data);
             }
-            catch (Exception ex)
+            catch (ArgumentException ex)
             {
                 _logger.LogInformation(ex.Message);
                 return BadRequest(ex.Message);
+            } 
+            catch (Exception ex)
+            {
+                return StatusCode((int)HttpStatusCode.InternalServerError, ex.Message);
             }
         }
 
@@ -80,14 +49,13 @@ namespace KingsmenUrbanization.WebApp.Controllers
         {
             try
             {
-                //var count = _UrbanizationByStateService.GetStateUrbanization().Count();
                 var count = await _UrbanizationByStateService.GetCountyUrbanizationCount();
                 return count;
             }
             catch (Exception ex)
             {
                 _logger.LogInformation(ex.Message);
-                return BadRequest(ex.Message);
+                return StatusCode((int)HttpStatusCode.InternalServerError, ex.Message);
             }
         }
     }

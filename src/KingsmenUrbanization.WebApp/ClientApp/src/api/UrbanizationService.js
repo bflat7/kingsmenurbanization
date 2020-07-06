@@ -1,7 +1,7 @@
 export default class UrbanizationService {
     async getTotalUrbanzationByStateDataCount() {
         try {
-            const response = await fetch('urbanization/count');
+            const response = await fetch("urbanization/count");
             if (response.status === 200) {
                 const data = await response.json();
                 return data;
@@ -13,27 +13,27 @@ export default class UrbanizationService {
         }
     }
 
-    async getUrbanizationByStateData(page, rowsPerPage, orderBy, order){
-        try {
-            const response = await fetch('urbanization?' + createQueryString(page, rowsPerPage, orderBy, order), { 
-                headers: {'Content-Type': 'application/json'}});
-            if (response.status === 200) {
+    async getUrbanizationByStateData(page, rowsPerPage, orderBy, order, signal) {
+        return fetch("urbanization?" + createQueryString(page, rowsPerPage, orderBy, order), {
+            headers: {"Content-Type": "application/json"},
+            signal,
+        }).then(async (response) => {
+            if(response.status === 200) {
                 const data = await response.json();
                 return data;
             } else {
                 const errorMessage = await response.json();
-                throw errorMessage
+                return errorMessage;
             }
-        } catch (e) {
-            throw e;
-        }
+        }).catch((err) => {
+            throw err;
+        })
     }
 }
 
-
 function createQueryString(page, rowsPerPage, orderBy, order) {
-    const data = {'page': page, 'rowsPerPage': rowsPerPage,
-        'orderBy': orderBy ?? "", 'order': order ?? ""
+    const data = {"page": page, "rowsPerPage": rowsPerPage,
+        "orderBy": orderBy ?? "", "order": order ?? ""
     };
     return encodeData(data);
 }
@@ -41,6 +41,6 @@ function createQueryString(page, rowsPerPage, orderBy, order) {
 function encodeData (data) {
     const ret = [];
     for (let d in data)
-      ret.push(encodeURIComponent(d) + '=' + encodeURIComponent(data[d]));
-    return ret.join('&');
+      ret.push(encodeURIComponent(d) + "=" + encodeURIComponent(data[d]));
+    return ret.join("&");
 }

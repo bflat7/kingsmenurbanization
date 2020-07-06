@@ -8,7 +8,6 @@ namespace Urbanization.Data.Abstractions
 {
     public interface IUrbanizationByStateStore
     {
-        //public IEnumerable<UrbanizationByState> GetUrbanizationByStates();
         public Task<IEnumerable<UrbanizationByState>> GetUrbanizationByStates();
     }
 }
