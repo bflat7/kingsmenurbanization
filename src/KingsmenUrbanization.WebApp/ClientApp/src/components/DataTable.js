@@ -19,7 +19,7 @@ const useStyles = makeStyles((theme) => ({
       color: "#fff",
     },
     tblContainer: {
-      height: 440,
+      height: 600,
     },
     container: {
         marginTop: "3rem",
